@@ -480,11 +480,28 @@ async function exportDiaryImage() {
     }
   }
 
+    // 保存完了通知表示用の関数
+    function showSaveToast() {
+      const toast = document.getElementById('saveToast');
+      if (!toast) return;
+
+      // 通知を表示
+      toast.classList.remove('opacity-0', '-translate-y-4', 'pointer-events-none');
+      toast.classList.add('opacity-100', 'translate-y-0');
+
+      // 2.5秒後に通知を消す
+      setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', '-translate-y-4', 'pointer-events-none');
+      }, 2500);
+    }
+
   // --- E. ダウンロード発火処理 ---
   const link = document.createElement('a');
   link.download = `絵日記_${dateVal || '夏のおもいで'}.png`;
   link.href = exportCanvas.toDataURL('image/png');
   link.click();
+  showSaveToast();
 }
 
 // --- イベント登録 ---
