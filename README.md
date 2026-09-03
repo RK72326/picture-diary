@@ -48,6 +48,15 @@
 - **デザイン・設計**: Figma（UIモックアップ作成)
 - **スタンプのイラスト制作**: MediBang Paint Pro
 
+---
+
+## 作成者 / Author
+
+- **開発者**: RK72326
+- **GitHub**: [@rk72326](https://github.com/rk72326)
+- **X (Twitter)**: [@RK72326_works](https://x.com/@RK72326_works) 
+  - 制作物のおしらせや開発ログを発信しています。
+
 
 
   
