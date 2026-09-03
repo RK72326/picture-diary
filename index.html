@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="picture-diary.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@300;400;500&display=swap" rel="stylesheet">
+  <title>夏の絵日記メーカー</title>
+</head>
+
+<body>
+  <!-- 全体を中央ぞろえにするコンテナ -->
+  <div class="h-[100dvh] flex flex-col items-center justify-center p-2 md:p-4 bg-sky-100/30 overflow-hidden box-border">
+
+    <!-- Canvasと右側エリアを「横並び」にする親要素 -->
+    <div class="flex flex-row items-stretch justify-center gap-2 md:gap-4 w-full max-w-4xl flex-1 min-h-0">
+
+      <!-- 左側エリア全体を「縦並び」にする親コンテナ -->
+      <div
+        class="flex flex-col w-[60%] sm:w-[65%] max-w-[500px] h-full justify-start p-3 border-4 border-blue-300 bg-sky-50/50 box-border gap-2">
+
+        <!-- タイトル表示 -->
+        <div class="text-center py-1 flex-shrink-0">
+          <h1 class="kiwi-maru-medium text-xl md:text-3xl font-bold text-sky-700 tracking-widest">
+            夏の絵日記メーカー
+          </h1>
+        </div>
+
+        <!-- 左側・上段： 絵日記のキャンバス部分 -->
+        <div class="relative w-full aspect-[3/2] bg-sky-50 border-2 border-blue-300 overflow-hidden flex-shrink-0 shadow-sm">
+          <canvas 
+            id="diaryCanvas"
+            width="600" 
+            height="400"
+            class="w-full h-full cursor-crosshair block touch-none"></canvas>
+
+          <div id="canvasGuide" 
+               class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none opacity-40 transition-opacity duration-300">
+            <span class="text-3xl">🎨</span>
+            <p class="kiwi-maru-medium text-sky-800 text-xs md:text-sm mt-1">ここにお絵描きしてね</p>
+          </div>
+        </div>
+
+        <!-- 左側・中段： 日付＆天気ヘッダー -->
+        <div
+          class="flex flex-row justify-between items-center px-3 py-3 bg-sky-600 shadow-sm text-sky-100 font-bold flex-shrink-0 rounded-sm text-xs md:text-sm gap-2 md:gap-3">
+          <div class="flex gap-1.5 md:gap-2 items-center">
+            <label for="diaryDate">日付：</label>
+            <input type="date" id="diaryDate"
+              class="text-sky-800 bg-sky-50 border border-sky-200 rounded px-1.5 py-0.5 text-xs md:text-sm focus:outline-none" />
+          </div>
+
+          <div class="flex gap-1.5 md:gap-2 items-center">
+            <label for="diaryWeather">天気：</label>
+            <select id="diaryWeather"
+              class="text-sky-800 bg-sky-50 border border-sky-200 rounded px-1.5 py-0.5 text-xs md:text-sm focus:outline-none">
+              <option value="🌞 はれ">🌞 はれ</option>
+              <option value="🌥 くもり">🌥 くもり</option>
+              <option value="☔ あめ">☔ あめ</option>
+              <option value="⛄ ゆき">⛄ ゆき</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 左側・下段：本文入力エリア -->
+        <div class="flex flex-col flex-shrink-0">
+          <textarea id="diaryText" rows="9" placeholder="きょうの思い出を書きましょう..."
+            class="kiwi-maru-regular w-full text-sky-700 border border-blue-300 bg-sky-50 p-2 leading-relaxed focus:outline-none focus:ring-1 focus:ring-sky-500 resize-none"
+            style="
+            font-size: 20px;
+            line-height: 46px;
+            height: 415px;
+            padding-top: 0px;
+            padding-bottom: 0px;
+            overflow: hidden;
+            background-image: repeating-linear-gradient(transparent, transparent 45px, #7fd5fa 45px, #7fd5fa 46px);
+            background-position-y: 0px;"></textarea>
+        </div>
+      </div>
+
+      <!-- 右側エリア全体を「縦並び」にする親コンテナ -->
+      <div class="flex flex-col justify-between w-[40%] sm:w-[35%] max-w-[260px] h-full gap-1.5 min-h-0">
+
+        <!-- 右側・上段：描画ツールのボックス -->
+        <div class="flex flex-col gap-1.5 border border-blue-300 bg-sky-50 p-2 shadow-sm">
+
+          <!-- 描画ツール　タイトル表示 -->
+          <div class="border-b-2 border-blue-300 flex flex-col justify-between">
+            <p class="kiwi-maru-light text-sm md:text-lg text-sky-700 font-bold">描画ツール</p>
+            <p class="kiwi-maru-light text-xs md:text-sm text-sky-600 font-bold">Drawing Tools</p>
+          </div>
+
+          <!-- ペンと消しゴムツールバー -->
+          <div class="md:mt-1 flex gap-3">
+            <button id="penBtn"
+              class="kiwi-maru-regular tool-btn flex-1 py-1 md:py-2 border border-blue-300 bg-sky-100 text-blue-500 font-bold rounded hover:bg-sky-200 text-sm md:text-base">✏選択中</button>
+            <button id="eraserBtn"
+              class="kiwi-maru-regular tool-btn flex-1 py-1 md:py-2 border border-blue-300 bg-sky-100 text-blue-500 font-bold rounded hover:bg-sky-200 text-sm md:text-base">□消しゴム</button>
+          </div>
+
+          <!-- ペンの色を変更するカラーパレット -->
+          <div class="md:mt-1">
+            <label class="kiwi-maru-light text-[12px] md:text-sm/4 text-sky-600 font-bold">ふでの色 / Color</label>
+
+            <div class="flex justify-center">
+              <div class="grid grid-cols-6 gap-1 mt-1">
+                <!-- 上段:カラーパレットの色を変更するボタン -->
+                <button class="color-btn w-8 h-8 rounded-md bg-black border border-blue-300"
+                  data-color="#000000"></button>
+                <button class="color-btn w-8 h-8 rounded-md bg-gray-500 border border-blue-300"
+                  data-color="#808080"></button>
+                <button class="color-btn w-8 h-8 rounded-md bg-amber-800 border border-blue-300"
+                  data-color="#a0522d"></button>
+                <button class="color-btn w-8 h-8 rounded-md bg-orange-200 border border-blue-300"
+                  data-color="#ffe4c4"></button>
+                <button class="color-btn w-8 h-8 rounded-md bg-amber-500 border border-blue-300"
+                  data-color="#ffa500"></button>
+                <button class="color-btn w-8 h-8 rounded-md bg-red-600 border border-blue-300"
+                  data-color="#ff0000"></button>
+                <!-- 下段:カラーパレットの色を変更するボタン -->
+                <button class="color-btn w-8 h-8 rounded-md bg-blue-700 border border-blue-300"
+                  data-color="#0000ff"></button>
+                <button class="color-btn w-8 h-8 rounded-md bg-cyan-300 border border-blue-300"
+                  data-color="#00ffff"></button>
+                <button class="color-btn w-8 h-8 rounded-md bg-green-600 border border-blue-300"
+                  data-color="#008000"></button>
+                <button class="color-btn w-8 h-8 rounded-md bg-lime-400 border border-blue-300"
+                  data-color="#00ff00"></button>
+                <button class="color-btn w-8 h-8 rounded-md bg-yellow-300 border border-blue-300"
+                  data-color="#ffff00"></button>
+                <button class="color-btn w-8 h-8 rounded-md bg-white border border-blue-300"
+                  data-color="#ffffff"></button>
+              </div>
+            </div>
+          </div>
+
+
+
+          <!-- ペンの太さを変更するスライダー -->
+          <div class="mt-1">
+            <div class="kiwi-maru-light text-[12px] md:text-sm/8 text-sky-600 font-bold flex justify-between">
+              <label for="sizeSlider">ふでの大きさ / Size</label>
+              <span id="sizeValue">5 px</span>
+            </div>
+            <input type="range" id="sizeSlider" min="1" max="20" value="5"
+              class="accent-sky-700 w-full cursor-pointer mb-5" />
+          </div>
+
+          <!-- 取り消し/全消しボタン -->
+          <div class="flex gap-3 mt-2">
+            <button id="undoBtn" disabled
+              class="kiwi-maru-light flex-1 px-4 py-1 border border-slate-400 bg-slate-300 text-slate-500 font-bold rounded cursor-not-allowed">↩取消</button>
+            <button id="clearBtn"
+              class="kiwi-maru-light flex-1 px-4 py-1 border border-red-300 bg-sky-100 text-red-500 font-bold rounded hover:bg-red-200">❌全消</button>
+          </div>
+        </div><!-- 描画ツールボックス終了-->
+
+        <!-- 右側・中段: スタンプパレットボックス -->
+        <div class="flex flex-col gap-4 border border-blue-300 bg-sky-50 p-2 shadow-md flex-1 min-h-0">
+          <div class="items-center border-b-2 border-blue-300 pb-0.5 justify-between items-center">
+            <p class="kiwi-maru-light text-sm md:text-lg text-sky-700 font-bold">スタンプパレット</p>
+            <p class="kiwi-maru-light text-xs md:text-sm text-sky-600 font-bold">Stamp Palette</p>
+          </div>
+
+          <!-- スタンプの画像を表示するパレット -->
+          <div class="grid grid-cols-3 gap-1 place-items-center overflow-y-auto flex-1 p-0.5 content-start">
+            <button
+              class="stampBtn p-1 w-full aspect-square border border-blue-300 bg-sky-100 transition-transform duration-200 hover:scale-105 rounded "
+              data-stamp="images/suika.png">
+              <img src="images/suika.png" alt="スイカ" class="w-full h-full object-contain">
+            </button>
+            <button
+              class="stampBtn p-1 w-full aspect-square border border-blue-300 bg-sky-100 transition-transform duration-200 hover:scale-105 rounded "
+              data-stamp="images/hurin.png">
+              <img src="images/hurin.png" alt="風鈴" class="w-full h-full object-contain">
+            </button>
+            <button
+              class="stampBtn p-1 w-full aspect-square border border-blue-300 bg-sky-100 transition-transform duration-200 hover:scale-105 rounded "
+              data-stamp="images/kakigori.png">
+              <img src="images/kakigori.png" alt="かき氷" class="w-full h-full object-contain">
+            </button>
+            <button
+              class="stampBtn p-1 w-full aspect-square border border-blue-300 bg-sky-100 transition-transform duration-200 hover:scale-105 rounded "
+              data-stamp="images/mugiwara.png">
+              <img src="images/mugiwara.png" alt="むぎわら" class="w-full h-full object-contain">
+            </button>
+            <button
+              class="stampBtn p-1 w-full aspect-square border border-blue-300 bg-sky-100 transition-transform duration-200 hover:scale-105 rounded "
+              data-stamp="images/himawari.png">
+              <img src="images/himawari.png" alt="ひまわり" class="w-full h-full object-contain">
+            </button>
+            <button
+              class="stampBtn p-1 w-full aspect-square border border-blue-300 bg-sky-100 transition-transform duration-200 hover:scale-105 rounded "
+              data-stamp="images/ramune.png">
+              <img src="images/ramune.png" alt="ラムネ" class="w-full h-full object-contain">
+            </button>
+            <button
+              class="stampBtn p-1 w-full aspect-square border border-blue-300 bg-sky-100 transition-transform duration-200 hover:scale-105 rounded "
+              data-stamp="images/hanabi.png">
+              <img src="images/hanabi.png" alt="花火" class="w-full h-full object-contain">
+            </button>
+            <button
+              class="stampBtn p-1 w-full aspect-square border border-blue-300 bg-sky-100 transition-transform duration-200 hover:scale-105 rounded "
+              data-stamp="images/kumo.png">
+              <img src="images/kumo.png" alt="雲" class="w-full h-full object-contain">
+            </button>
+            <button
+              class="stampBtn p-1 w-full aspect-square border border-blue-300 bg-sky-100 transition-transform duration-200 hover:scale-105 rounded "
+              data-stamp="images/sun.png">
+              <img src="images/sun.png" alt="太陽" class="w-full h-full object-contain">
+            </button>
+            <button
+              class="stampBtn p-1 w-full aspect-square border border-blue-300 bg-sky-100 transition-transform duration-200 hover:scale-105 rounded "
+              data-stamp="images/kaigara.png">
+              <img src="images/kaigara.png" alt="貝がら" class="w-full h-full object-contain">
+            </button>
+            <button
+              class="stampBtn p-1 w-full aspect-square border border-blue-300 bg-sky-100 transition-transform duration-200 hover:scale-105 rounded "
+              data-stamp="images/tyoutin.png">
+              <img src="images/tyoutin.png" alt="ちょうちん" class="w-full h-full object-contain">
+            </button>
+            <button
+              class="stampBtn p-1 w-full aspect-square border border-blue-300 bg-sky-100 transition-transform duration-200 hover:scale-105 rounded "
+              data-stamp="images/asteriskun_image.png">
+              <img src="images/asteriskun_image.png" alt="アスタリス君" class="w-full h-full object-contain">
+            </button>
+          </div>
+          <!-- 例：クレジット表記 -->
+          <p class="text-[10px] text-sky-700/70 text-center mt-2 kiwi-maru-light">
+            ※ スタンプの「アスタリス君」は権利者様の許可をいただいて使用しています。
+          </p>
+        </div><!-- スタンプパレットボックス終了 -->
+
+        <!-- 右側・下段：保存ボタン -->
+        <button id="downloadBtn"
+          class="kiwi-maru-light w-full py-2 bg-blue-600 text-white font-bold rounded hover:bg-blue-700 shadow-md transition text-sm md:text-base flex items-center justify-center gap-2">
+          <span>💾</span>絵日記を画像として保存
+        </button>
+
+      </div><!-- 右側エリア終了 -->
+    </div>
+  </div><!-- 全体コンテナ終了 -->
+
+  <script src="picture-diary.js"></script>
+</body>
+
+</html>
